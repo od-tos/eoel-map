@@ -33,70 +33,107 @@
   </div>
 
   <script>
-    "use strict";
+  "use strict";
 
-    const viewer = OpenSeadragon({
-      id: "map",
+  const maps = {
+    eoel: {
+      title: "Eoel",
+      subtitle: "Interaktive Weltkarte",
+      source: "maps/eoel.dzi"
+    },
 
-      prefixUrl: "openseadragon/images/",
+    kaiserreich: {
+      title: "Das Kaiserreich",
+      subtitle: "Politische Karte",
+      source: "maps/kaiserreich.dzi"
+    },
 
-      tileSources: "maps/eoel.dzi",
+    nordlande: {
+      title: "Die Nordlande",
+      subtitle: "Regionalkarte",
+      source: "maps/nordlande.dzi"
+    }
+  };
 
-      showNavigator: true,
-      navigatorPosition: "BOTTOM_RIGHT",
+  const parameters = new URLSearchParams(window.location.search);
+  const requestedMap = parameters.get("map") || "eoel";
 
-      showNavigationControl: true,
-      showZoomControl: true,
-      showHomeControl: true,
-      showFullPageControl: true,
-      showRotationControl: false,
+  const selectedMap = maps[requestedMap];
 
-      animationTime: 0.8,
-      blendTime: 0.1,
-      springStiffness: 7,
+  if (!selectedMap) {
+    document.getElementById("map").innerHTML = `
+      <div class="map-error">
+        <strong>Die gewünschte Karte wurde nicht gefunden.</strong>
+        <span>Unbekannter Kartenname: ${requestedMap}</span>
+      </div>
+    `;
 
-      minZoomImageRatio: 0.85,
-      maxZoomPixelRatio: 3,
+    throw new Error(`Unbekannte Karte: ${requestedMap}`);
+  }
 
-      visibilityRatio: 0.75,
-      constrainDuringPan: true,
+  document.title = selectedMap.title;
 
-      preserveViewport: false,
-      immediateRender: false,
+  document.querySelector(".map-title strong").textContent =
+    selectedMap.title;
 
-      gestureSettingsMouse: {
-        clickToZoom: false,
-        dblClickToZoom: true,
-        scrollToZoom: true,
-        dragToPan: true
-      },
+  document.querySelector(".map-title span").textContent =
+    selectedMap.subtitle;
 
-      gestureSettingsTouch: {
-        clickToZoom: false,
-        dblClickToZoom: true,
-        pinchToZoom: true,
-        dragToPan: true,
-        flickEnabled: true
-      },
+  const viewer = OpenSeadragon({
+    id: "map",
 
-      gestureSettingsPen: {
-        clickToZoom: false,
-        dblClickToZoom: true,
-        pinchToZoom: true,
-        dragToPan: true
-      }
-    });
+    prefixUrl: "openseadragon/images/",
 
-    viewer.addHandler("open-failed", function (event) {
-      console.error("Die Karte konnte nicht geladen werden:", event);
+    tileSources: selectedMap.source,
 
-      document.getElementById("map").innerHTML = `
-        <div class="map-error">
-          <strong>Die Karte konnte nicht geladen werden.</strong>
-          <span>Überprüfe den Pfad zur DZI-Datei.</span>
-        </div>
-      `;
-    });
-  </script>
+    showNavigator: true,
+    navigatorPosition: "BOTTOM_RIGHT",
+
+    showNavigationControl: true,
+    showZoomControl: true,
+    showHomeControl: true,
+    showFullPageControl: true,
+    showRotationControl: false,
+
+    animationTime: 0.8,
+    blendTime: 0.1,
+    springStiffness: 7,
+
+    minZoomImageRatio: 0.85,
+    maxZoomPixelRatio: 3,
+
+    visibilityRatio: 0.75,
+    constrainDuringPan: true,
+
+    preserveViewport: false,
+    immediateRender: false,
+
+    gestureSettingsMouse: {
+      clickToZoom: false,
+      dblClickToZoom: true,
+      scrollToZoom: true,
+      dragToPan: true
+    },
+
+    gestureSettingsTouch: {
+      clickToZoom: false,
+      dblClickToZoom: true,
+      pinchToZoom: true,
+      dragToPan: true,
+      flickEnabled: true
+    }
+  });
+
+  viewer.addHandler("open-failed", function (event) {
+    console.error("Die Karte konnte nicht geladen werden:", event);
+
+    document.getElementById("map").innerHTML = `
+      <div class="map-error">
+        <strong>Die Karte konnte nicht geladen werden.</strong>
+        <span>Überprüfe die DZI-Datei: ${selectedMap.source}</span>
+      </div>
+    `;
+  });
+</script>
 </body>
 </html>
