@@ -1,0 +1,9 @@
+# Hochauflösende Originalkarten niemals hochladen
+original/
+
+# Windows-Dateien
+Thumbs.db
+Desktop.ini
+
+# macOS-Dateien
+.DS_Store

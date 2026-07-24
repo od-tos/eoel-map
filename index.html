@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta
+    name="description"
+    content="Interaktive Karte der Fantasywelt Eoel"
+  >
+
+  <title>Karte von Eoel</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="openseadragon/openseadragon.min.js"></script>
+</head>
+
+<body>
+  <main id="map" aria-label="Interaktive Karte von Eoel"></main>
+
+  <div class="map-title">
+    <strong>Eoel</strong>
+    <span>Interaktive Weltkarte</span>
+  </div>
+
+  <div class="map-help">
+    Mausrad: zoomen · Ziehen: Karte bewegen · Doppelklick: hineinzoomen
+  </div>
+
+  <script>
+    "use strict";
+
+    const viewer = OpenSeadragon({
+      id: "map",
+
+      prefixUrl: "openseadragon/images/",
+
+      tileSources: "maps/eoel.dzi",
+
+      showNavigator: true,
+      navigatorPosition: "BOTTOM_RIGHT",
+
+      showNavigationControl: true,
+      showZoomControl: true,
+      showHomeControl: true,
+      showFullPageControl: true,
+      showRotationControl: false,
+
+      animationTime: 0.8,
+      blendTime: 0.1,
+      springStiffness: 7,
+
+      minZoomImageRatio: 0.85,
+      maxZoomPixelRatio: 3,
+
+      visibilityRatio: 0.75,
+      constrainDuringPan: true,
+
+      preserveViewport: false,
+      immediateRender: false,
+
+      gestureSettingsMouse: {
+        clickToZoom: false,
+        dblClickToZoom: true,
+        scrollToZoom: true,
+        dragToPan: true
+      },
+
+      gestureSettingsTouch: {
+        clickToZoom: false,
+        dblClickToZoom: true,
+        pinchToZoom: true,
+        dragToPan: true,
+        flickEnabled: true
+      },
+
+      gestureSettingsPen: {
+        clickToZoom: false,
+        dblClickToZoom: true,
+        pinchToZoom: true,
+        dragToPan: true
+      }
+    });
+
+    viewer.addHandler("open-failed", function (event) {
+      console.error("Die Karte konnte nicht geladen werden:", event);
+
+      document.getElementById("map").innerHTML = `
+        <div class="map-error">
+          <strong>Die Karte konnte nicht geladen werden.</strong>
+          <span>Überprüfe den Pfad zur DZI-Datei.</span>
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>
