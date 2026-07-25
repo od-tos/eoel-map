@@ -123,7 +123,7 @@
   document.querySelector(".map-title span").textContent =
     selectedMap.subtitle;
 
-    const popup = document.getElementById("location-popup");
+const popup = document.getElementById("location-popup");
 const popupTitle = document.getElementById("location-popup-title");
 const popupDescription = document.getElementById(
   "location-popup-description"
@@ -239,10 +239,22 @@ document.addEventListener("keydown", function (event) {
       `Informationen zu ${location.title} anzeigen`
     );
 
-    marker.addEventListener("click", function (event) {
-      event.stopPropagation();
-      openLocationPopup(location);
-    });
+   new OpenSeadragon.MouseTracker({
+  element: marker,
+
+  clickHandler: function (event) {
+    event.preventDefaultAction = true;
+    openLocationPopup(location);
+  },
+
+  pressHandler: function (event) {
+    event.preventDefaultAction = true;
+  },
+
+  releaseHandler: function (event) {
+    event.preventDefaultAction = true;
+  }
+});
 
     const imagePoint = new OpenSeadragon.Point(
       location.x,
