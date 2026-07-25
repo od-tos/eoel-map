@@ -21,7 +21,26 @@
 </head>
 
 <body>
-  <main id="map" aria-label="Interaktive Karte von Eoel"></main>
+  <main id="map" aria-label="Interaktive Karte"></main>
+
+  <aside
+  id="location-popup"
+  class="location-popup"
+  aria-hidden="true"
+  aria-live="polite"
+>
+  <button
+    id="location-popup-close"
+    class="location-popup-close"
+    type="button"
+    aria-label="Informationsfenster schließen"
+  >
+    ×
+  </button>
+
+  <h2 id="location-popup-title"></h2>
+  <div id="location-popup-description"></div>
+</aside>
 
   <div class="map-title">
     <strong>Eoel</strong>
@@ -39,8 +58,20 @@
     eoel: {
       title: "Eoel",
       subtitle: "Interaktive Weltkarte",
-      source: "maps/eoel.dzi"
-    },
+      source: "maps/eoel.dzi",
+
+       locations: [
+      {
+        id: "Tarmir-Run",
+        title: "Tarmir-Run",
+        description:
+          "Die Hautpstadt des Kaiserreichs Tarmir",
+        x: 1843,
+        y: 3503,
+        symbol: "★"
+
+
+    }]},
 
     wijndburg: {
       title: "Wijnburg",
@@ -61,7 +92,7 @@
     }
 
 
-  };
+  }
 
   const parameters = new URLSearchParams(window.location.search);
   const requestedMap = parameters.get("map") || "eoel";
@@ -86,6 +117,38 @@
 
   document.querySelector(".map-title span").textContent =
     selectedMap.subtitle;
+
+    const popup = document.getElementById("location-popup");
+const popupTitle = document.getElementById("location-popup-title");
+const popupDescription = document.getElementById(
+  "location-popup-description"
+);
+const popupCloseButton = document.getElementById(
+  "location-popup-close"
+);
+
+function openLocationPopup(location) {
+  popupTitle.textContent = location.title;
+  popupDescription.textContent = location.description;
+
+  popup.classList.add("is-visible");
+  popup.setAttribute("aria-hidden", "false");
+
+  popupCloseButton.focus();
+}
+
+function closeLocationPopup() {
+  popup.classList.remove("is-visible");
+  popup.setAttribute("aria-hidden", "true");
+}
+
+popupCloseButton.addEventListener("click", closeLocationPopup);
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    closeLocationPopup();
+  }
+});
 
   const viewer = OpenSeadragon({
     id: "map",
@@ -131,6 +194,73 @@
       flickEnabled: true
     }
   });
+
+  viewer.addHandler("open", function () {
+  const tiledImage = viewer.world.getItemAt(0);
+
+  if (!tiledImage) {
+    console.error("Das Kartenbild wurde nicht gefunden.");
+    return;
+  }
+
+  for (const location of selectedMap.locations ?? []) {
+    const marker = document.createElement("button");
+
+    marker.type = "button";
+    marker.className = "map-marker";
+    marker.id = `marker-${location.id}`;
+    marker.textContent = location.symbol ?? "●";
+    marker.title = location.title;
+    marker.setAttribute(
+      "aria-label",
+      `Informationen zu ${location.title} anzeigen`
+    );
+
+    marker.addEventListener("click", function (event) {
+      event.stopPropagation();
+      openLocationPopup(location);
+    });
+
+    const imagePoint = new OpenSeadragon.Point(
+      location.x,
+      location.y
+    );
+
+    const viewportPoint =
+      tiledImage.imageToViewportCoordinates(imagePoint);
+
+    viewer.addOverlay({
+      element: marker,
+      location: viewportPoint,
+      placement: OpenSeadragon.Placement.BOTTOM
+    });
+  }
+});
+
+//Temporaerr fuer Koordinatenermittlung
+
+viewer.addHandler("canvas-click", function (event) {
+  if (!event.quick) {
+    return;
+  }
+
+  const tiledImage = viewer.world.getItemAt(0);
+
+  if (!tiledImage) {
+    return;
+  }
+
+  const viewportPoint =
+    viewer.viewport.pointFromPixel(event.position);
+
+  const imagePoint =
+    tiledImage.viewportToImageCoordinates(viewportPoint);
+
+  console.log({
+    x: Math.round(imagePoint.x),
+    y: Math.round(imagePoint.y)
+  });
+});
 
   viewer.addHandler("open-failed", function (event) {
     console.error("Die Karte konnte nicht geladen werden:", event);
