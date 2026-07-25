@@ -133,6 +133,7 @@ const popupCloseButton = document.getElementById(
 );
 
 function openLocationPopup(location) {
+  console.log("Marker angeklickt:", location.title);
   popupTitle.textContent = location.title;
   popupDescription.replaceChildren();
 
