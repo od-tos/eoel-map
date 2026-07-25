@@ -64,8 +64,13 @@
       {
         id: "Tarmir-Run",
         title: "Tarmir-Run",
-        description:
+        paragraphs: [
           "Die Hautpstadt des Kaiserreichs Tarmir",
+          "Sitz der Kaiserlichen Akademie für Arkane Künste"
+        ],
+
+        url: "https://publish.obsidian.md/ttrpg-gaia/Geografie/St%C3%A4dte/Tarmir-Run"
+          
         x: 1843,
         y: 3503,
         symbol: "★"
@@ -129,7 +134,25 @@ const popupCloseButton = document.getElementById(
 
 function openLocationPopup(location) {
   popupTitle.textContent = location.title;
-  popupDescription.textContent = location.description;
+  popupDescription.replaceChildren();
+
+  for (const paragraphText of location.paragraphs ?? []) {
+    const paragraph = document.createElement ("p");
+    paragraph.textContent = paragraphText;
+    popupDescription.appendChild(paragraph);
+  }
+
+  if (location.url) {
+  const link = document.createElement("a");
+
+  link.href = location.url;
+  link.target = "_parent";
+  link.rel = "noopener";
+  link.className = "location-popup-link";
+  link.textContent = "Artikel im Wiki öffnen";
+
+  popupDescription.appendChild(link);
+}
 
   popup.classList.add("is-visible");
   popup.setAttribute("aria-hidden", "false");

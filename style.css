@@ -281,3 +281,16 @@ body {
     height: 34px;
   }
 }
+
+.location-popup-link {
+  display: inline-block;
+  margin-top: 0.7rem;
+
+  color: #efd79d;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.location-popup-link:hover {
+  text-decoration: underline;
+}
